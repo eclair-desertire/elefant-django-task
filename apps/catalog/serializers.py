@@ -7,7 +7,7 @@ from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
-from apps.catalog.models import User
+from apps.catalog.models import User, Book, Review, Genre
 from rest_framework.pagination import PageNumberPagination
 
 class TokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -88,3 +88,28 @@ class UserSerializer(serializers.ModelSerializer):
             self.validated_data['password'] = make_password(password)
 
         return super().save()
+
+class BookListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Book
+        fields=('book_name','genre','author','avg_rate',)
+
+class BookSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Book
+        fields=('__all__')
+
+class ReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Review
+        fields=('__all__')
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Genre
+        fields=('__all__')
+

@@ -38,7 +38,8 @@ class RegisterUserView(generics.CreateAPIView):
     @extend_schema(
         request=serializer_class,
         responses={200: serializer_class},
-        methods=['POST']
+        methods=['POST'],
+        tags=['User Registration']
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)

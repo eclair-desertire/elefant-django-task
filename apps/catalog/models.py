@@ -39,7 +39,7 @@ class Book(models.Model):
     author=models.CharField('Автор',max_length=255,default='',blank=True,null=True)
     description=models.TextField('Описание книги',default='',blank=True,null=True)
     published_date=models.DateTimeField()
-    avg_rate=models.IntegerField('Средний рейтинг книги')
+    avg_rate=models.IntegerField('Средний рейтинг книги',default=0)
 
     reviews=models.ManyToManyField(
         Review,
@@ -47,6 +47,18 @@ class Book(models.Model):
         blank=True,
         null=True
     )
+
+    @classmethod
+    def calculate_avg_rate(self):
+        if self.reviews:
+            
+            for i in self.reviews:
+                self.avg_rate+=i
+
+            self.avg_rate/=len(self.reviews)
+
+            self.save()
+            
 
 
 
