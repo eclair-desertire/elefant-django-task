@@ -20,25 +20,27 @@ class Review(models.Model):
 
 class Genre(models.Model):
     genre_id=models.AutoField(primary_key=True)
-    genre=models.CharField('Жанр',max_length=255,default='',unique=True)
+    genre_name=models.CharField('Жанр',max_length=255,default='',unique=True)
 
 
     def __str__(self) -> str:
-        return self.genre
+        return self.genre_name
 
 class Book(models.Model):
     book_id=models.AutoField(primary_key=True)
     book_name=models.CharField('Наименование книги',max_length=255,default='')
 
-    genre=models.OneToOneField(
+    genre_name=models.ForeignKey(
         Genre,
         related_name='books',
+        to_field='genre_name',
+        db_column='genre',
         on_delete=models.CASCADE
     )
 
     author=models.CharField('Автор',max_length=255,default='',blank=True,null=True)
     description=models.TextField('Описание книги',default='',blank=True,null=True)
-    published_date=models.DateTimeField()
+    published_date=models.DateField()
     avg_rate=models.IntegerField('Средний рейтинг книги',default=0)
 
     reviews=models.ManyToManyField(
@@ -51,7 +53,7 @@ class Book(models.Model):
     @classmethod
     def calculate_avg_rate(self):
         if self.reviews:
-            
+
             for i in self.reviews:
                 self.avg_rate+=i
 

@@ -90,10 +90,13 @@ class UserSerializer(serializers.ModelSerializer):
         return super().save()
 
 class BookListSerializer(serializers.ModelSerializer):
+    #genre_name=serializers.CharField(source='genre.genre',read_only=True)
 
     class Meta:
         model=Book
-        fields=('book_name','genre','author','avg_rate',)
+        fields=('book_name','genre_name','author','avg_rate',)
+    
+
 
 class BookSerializer(serializers.ModelSerializer):
     

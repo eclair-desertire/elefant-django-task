@@ -11,7 +11,7 @@ class BooksListView(ModelViewSet):
     serializer_class=serializers.BookListSerializer
     queryset=Book.objects.all()
     filterset_fields={
-        'genre':['exact'],
+        'genre_name':['exact'],
         'author':['exact'],
         'published_date':['year', 'month', 'month__in', 'year__in',
                  'month__gte', 'month__lte','year__gte','year__lte','gte','lte'],
@@ -24,6 +24,19 @@ class BooksListView(ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+class BookView(ModelViewSet):
+    permission_classes=[AllowAny,]
+    serializer_class=serializers.BookSerializer
+    queryset=Book.objects.all()
+
+    @extend_schema(
+        responses={200: serializer_class},
+        methods=['GET'],
+        tags=['Book Overview']
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 class GenreList(generics.ListAPIView):
     queryset=Genre.objects.all()

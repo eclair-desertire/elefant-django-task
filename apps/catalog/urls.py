@@ -9,4 +9,5 @@ urlpatterns=[
     path('logout/',common.LogoutFormView.as_view()),
 
     path('books/',books.BooksListView.as_view({'get':'list'})),
+    path('book/<int:pk>/',books.BookView.as_view({'get':'retrieve'})),
 ]
