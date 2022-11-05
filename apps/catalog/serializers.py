@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from apps.catalog.models import User, Book, Review, Genre
 from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import get_object_or_404
 
 class TokenObtainPairSerializer(TokenObtainPairSerializer):
 
@@ -67,7 +68,46 @@ class Pagination(PageNumberPagination):
             'results': data
         })
 
+class ReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Review
+        fields=('review_id','book_id','explanation','rate')
+        extra_kwargs={
+            'review_id':{'required':False},
+        }
+    
+    def create(self, validated_data):
+        instance=super().create(validated_data)
+        print(self.context)
+        print('*'*50)
+        book=get_object_or_404(Book.objects.all(),pk=validated_data.get('book_id'))
+        instance.books.add(book)
+        instance.users.add(self.context.get('request').user)
+        return super().create(validated_data)
+
+
+
+class BookSerializer(serializers.ModelSerializer):
+    
+    reviews=ReviewSerializer(many=True,required=False)
+    class Meta:
+        model=Book
+        fields=('book_id','book_name','genre_name',
+            'author','description','published_date',
+            'avg_rate','reviews')
+
+        extra_kwargs={
+            'genre_name':{'required':False},
+            'published_date':{'required':False},
+            'reviews':{'required':False},
+        }
+
+
 class UserSerializer(serializers.ModelSerializer):
+    books=BookSerializer(many=True, required=False)
+    reviews=ReviewSerializer(many=True,required=False)
+    
     password = serializers.CharField(
         max_length=255,
         min_length=8,
@@ -76,10 +116,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id','username','password','fav_books','reviews')
+        fields = ('id','username','password','reviews','books')
         extra_kwargs={
-            'fav_books':{'required':False},
             'reviews':{'required':False},
+            'books':{'required':False},
         }
 
     def save(self):
@@ -98,17 +138,7 @@ class BookListSerializer(serializers.ModelSerializer):
     
 
 
-class BookSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model=Book
-        fields=('__all__')
 
-class ReviewSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model=Review
-        fields=('__all__')
 
 class GenreSerializer(serializers.ModelSerializer):
 
